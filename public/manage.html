@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理账号</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.1.0/fonts/remixicon.css">
+    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/d/df/Microsoft_Office_Outlook_%282018%E2%80%93present%29.svg">
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --text-color: #212529;
+            --accent-color: #0078d4;
+            --card-bg: #fff;
+            --card-border: #c8c8c8;
+            --button-primary: #0078d4;
+            --button-primary-hover: #005a9e;
+            --button-warning: #fd7e14;
+            --button-warning-hover: #e36c0a;
+            --button-danger: #dc3545;
+            --button-danger-hover: #c82333;
+            --header-bg: #fff;
+            --header-border-bottom: #e0e0e0;
+            --form-label-color: #495057;
+            --checkbox-bg: #fff;
+            --checkbox-border: #adb5bd;
+            --batch-actions-bg: #f8f9fa;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #18191a;
+                --text-color: #f0f0f0;
+                --accent-color: #3ab7f0;
+                --card-bg: #333;
+                --card-border: #555;
+                --button-primary: #3ab7f0;
+                --button-primary-hover: #2a88b8;
+                --button-warning: #fd7e14;
+                --button-warning-hover: #e36c0a;
+                --button-danger: #c82333;
+                --button-danger-hover: #b01a28;
+                --header-bg: #333;
+                --header-border-bottom: #555;
+                --form-label-color: #bbb;
+                --checkbox-bg: #333;
+                --checkbox-border: #666;
+                --batch-actions-bg: #2a2a2a;
+            }
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .header {
+            background-color: var(--header-bg);
+            border-bottom: 1px solid var(--header-border-bottom);
+            padding: 15px 0;
+            text-align: center;
+            width: 100%;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .header-content {
+            width: 90%;
+            max-width: 700px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 700px;
+            padding-bottom: 80px; /* 增加底部间距，避免被批量操作栏遮挡 */
+        }
+
+        h1 {
+            color: var(--accent-color);
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+        }
+
+        .back-link {
+            text-align: right;
+            margin-bottom: 1.5rem;
+        }
+
+        .back-link a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+
+        .import-area {
+            margin-bottom: 1.5rem;
+        }
+
+        .import-area h2, .add-account-form h2 {
+            font-size: 1.4rem;
+            color: var(--text-color);
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+
+        .import-area label, .add-account-form label {
+            display: block;
+            margin-bottom: 0.4rem;
+            font-size: 0.9rem;
+            color: var(--form-label-color);
+        }
+
+        .import-area input, .import-area textarea, .add-account-form input, .add-account-form textarea {
+            width: calc(100% - 1.6rem);
+            padding: 0.6rem 0.8rem;
+            margin-bottom: 0.8rem;
+            border: 1px solid var(--card-border);
+            border-radius: 0.3rem;
+            font-size: 0.9rem;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+        }
+
+        .add-account-form button, .import-area button {
+            padding: 0.6rem 1.2rem;
+            border: 1px solid transparent;
+            border-radius: 0.3rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.15s ease-in-out;
+            box-shadow: none;
+            background-color: var(--button-primary);
+            color: white;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .add-account-form button:hover, .import-area button:hover {
+            background-color: var(--button-primary-hover);
+            border-color: var(--button-primary-hover);
+        }
+
+        /* 账号列表样式 */
+        .accounts-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .accounts-header h2 {
+            font-size: 1.4rem;
+            color: var(--text-color);
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .account {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 0.3rem;
+            padding: 0.8rem 1rem;
+            margin-bottom: 0.8rem;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+        }
+        
+        /* 复选框样式 */
+        .account-checkbox {
+            margin-right: 0.8rem;
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+            background-color: var(--checkbox-bg);
+            border: 1px solid var(--checkbox-border);
+        }
+        
+        .account-info {
+            flex-grow: 1;
+            overflow: hidden;
+        }
+
+        .account h3 {
+            color: var(--text-color);
+            margin-top: 0;
+            margin-bottom: 0;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .account h3 {
+                font-size: 0.9rem;
+            }
+        }
+
+        .account h3:hover {
+            text-decoration: underline;
+        }
+
+        .account .actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .account .actions button {
+            padding: 0.4rem 0.8rem;
+            border: none;
+            border-radius: 0.3rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background-color 0.15s ease-in-out;
+            box-shadow: none;
+            background-color: var(--button-danger);
+            color: white;
+            min-width: auto;
+            width: auto;
+        }
+
+        .account .actions button:hover {
+            background-color: var(--button-danger-hover);
+            box-shadow: none;
+        }
+        
+        /* 批量操作栏样式 */
+        .batch-actions {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--batch-actions-bg);
+            border-top: 1px solid var(--card-border);
+            padding: 0.8rem 0;
+            display: none;
+            justify-content: center;
+            z-index: 100;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .batch-actions.show {
+            display: flex;
+        }
+        
+        .batch-actions-inner {
+            width: 90%;
+            max-width: 700px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .batch-counter {
+            font-size: 0.9rem;
+            color: var(--text-color);
+        }
+        
+        .batch-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .batch-buttons button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.3rem;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background-color 0.15s;
+        }
+        
+        .btn-danger {
+            background-color: var(--button-danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: var(--button-danger-hover);
+        }
+        
+        .btn-warning {
+            background-color: var(--button-warning);
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background-color: var(--button-warning-hover);
+        }
+        
+        .select-all-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.8rem;
+            cursor: pointer;
+        }
+        
+        .select-all-container input {
+            margin-right: 0.5rem;
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+        }
+        
+        .select-all-container label {
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-bottom: 0;
+            color: var(--text-color);
+        }
+
+        /* 搜索框 */
+        .search-container {
+            margin-bottom: 1rem;
+        }
+        
+        .search-container input {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            border: 1px solid var(--card-border);
+            border-radius: 0.3rem;
+            font-size: 0.9rem;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <h1>管理账号</h1>
+        </div>
+    </header>
+    <div class="container">
+        <div class="back-link">
+            <a href="/">返回邮箱 API 客户端</a>
+        </div>
+        <div class="import-area">
+            <h2>账号导入</h2>
+            <label for="delimiter">分隔符:</label>
+            <input type="text" id="delimiter" placeholder="默认为 ----">
+            <textarea id="importText" placeholder="粘贴导入字符串，每行一个账号，例如：email----password----clientId----refreshToken&#10;支持批量导入，每个账号占一行" rows="6"></textarea>
+            <button onclick="importAccount()" class="btn-primary">导入账号</button>
+        </div>
+        <div class="add-account-form">
+            <h2>添加账号</h2>
+            <form id="addAccountForm">
+                <label for="email">邮箱:</label>
+                <input type="email" id="email" name="email" required>
+                <label for="refresh_token">Refresh Token:</label>
+                <input type="text" id="refresh_token" name="refresh_token" required>
+                <label for="client_id">Client ID:</label>
+                <input type="text" id="client_id" name="client_id" required>
+                <button type="submit">添加账号</button>
+            </form>
+        </div>
+        
+        <div class="accounts-section">
+            <div class="accounts-header">
+                <h2>账号列表</h2>
+                <span id="account-count">共 0 个账号</span>
+            </div>
+            
+            <!-- 搜索框 -->
+            <div class="search-container">
+                <input type="text" id="searchBox" placeholder="搜索邮箱..." oninput="filterAccounts()">
+            </div>
+            
+            <!-- 全选复选框 -->
+            <div class="select-all-container">
+                <input type="checkbox" id="selectAll" onclick="toggleSelectAll()">
+                <label for="selectAll">全选</label>
+            </div>
+            
+            <div id="accounts"></div>
+        </div>
+    </div>
+    
+    <!-- 批量操作栏 -->
+    <div class="batch-actions" id="batchActions">
+        <div class="batch-actions-inner">
+            <div class="batch-counter" id="selectedCount">已选择 0 个账号</div>
+            <div class="batch-buttons">
+                <button class="btn-warning" onclick="exportSelected()">导出所选</button>
+                <button class="btn-danger" onclick="deleteSelected()">删除所选</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量，存储所有账号和已选中的账号
+        let allAccounts = {};
+        let selectedAccounts = new Set();
+        let filteredAccounts = {};
+        
+        async function loadAccounts() {
+            try {
+                const response = await fetch('/accounts');
+                allAccounts = await response.json();
+                filteredAccounts = {...allAccounts};
+                
+                displayAccounts();
+                updateAccountCount();
+            } catch (error) {
+                alert('加载账号失败: ' + error.message);
+            }
+        }
+        
+        function updateAccountCount() {
+            const count = Object.keys(filteredAccounts).length;
+            document.getElementById('account-count').textContent = `共 ${count} 个账号`;
+        }
+        
+        function displayAccounts() {
+            const accountsDiv = document.getElementById('accounts');
+            accountsDiv.innerHTML = '';
+            
+            // 按字母顺序排序邮箱
+            const sortedEmails = Object.keys(filteredAccounts).sort();
+            
+            for (const email of sortedEmails) {
+                const account = filteredAccounts[email];
+                const accountDiv = document.createElement('div');
+                accountDiv.classList.add('account');
+                
+                const isChecked = selectedAccounts.has(email);
+                
+                accountDiv.innerHTML = `
+                    <input type="checkbox" class="account-checkbox" data-email="${email}" ${isChecked ? 'checked' : ''} onchange="toggleAccountSelection('${email}')">
+                    <div class="account-info">
+                        <h3 onclick="copyEmailToClipboard('${email}')" title="点击复制">${email}</h3>
+                    </div>
+                    <div class="actions">
+                        <button onclick="deleteAccount(event, '${email}')">删除</button>
+                    </div>
+                `;
+                accountsDiv.appendChild(accountDiv);
+            }
+            
+            // 更新全选复选框状态
+            updateSelectAllCheckbox();
+        }
+        
+        function filterAccounts() {
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase().trim();
+            
+            if (!searchTerm) {
+                filteredAccounts = {...allAccounts};
+            } else {
+                filteredAccounts = {};
+                for (const email in allAccounts) {
+                    if (email.toLowerCase().includes(searchTerm)) {
+                        filteredAccounts[email] = allAccounts[email];
+                    }
+                }
+            }
+            
+            displayAccounts();
+            updateAccountCount();
+        }
+        
+        function toggleAccountSelection(email) {
+            if (selectedAccounts.has(email)) {
+                selectedAccounts.delete(email);
+            } else {
+                selectedAccounts.add(email);
+            }
+            
+            updateBatchActionsBar();
+            updateSelectAllCheckbox();
+        }
+        
+        function toggleSelectAll() {
+            const selectAllCheckbox = document.getElementById('selectAll');
+            
+            if (selectAllCheckbox.checked) {
+                // 全选当前筛选结果中的所有邮箱
+                for (const email in filteredAccounts) {
+                    selectedAccounts.add(email);
+                }
+            } else {
+                // 取消选择当前筛选结果中的所有邮箱
+                for (const email in filteredAccounts) {
+                    selectedAccounts.delete(email);
+                }
+            }
+            
+            // 刷新显示
+            displayAccounts();
+            updateBatchActionsBar();
+        }
+        
+        function updateSelectAllCheckbox() {
+            const selectAllCheckbox = document.getElementById('selectAll');
+            
+            // 获取当前筛选结果中的邮箱数量
+            const filteredCount = Object.keys(filteredAccounts).length;
+            
+            // 计算当前筛选结果中已选中的数量
+            let selectedFilteredCount = 0;
+            for (const email in filteredAccounts) {
+                if (selectedAccounts.has(email)) {
+                    selectedFilteredCount++;
+                }
+            }
+            
+            // 如果所有已筛选邮箱都被选中，则全选框为选中状态
+            selectAllCheckbox.checked = filteredCount > 0 && selectedFilteredCount === filteredCount;
+            
+            // 设置全选框的不确定状态（部分选中）
+            selectAllCheckbox.indeterminate = selectedFilteredCount > 0 && selectedFilteredCount < filteredCount;
+        }
+        
+        function updateBatchActionsBar() {
+            const batchActions = document.getElementById('batchActions');
+            const selectedCount = document.getElementById('selectedCount');
+            
+            if (selectedAccounts.size > 0) {
+                batchActions.classList.add('show');
+                selectedCount.textContent = `已选择 ${selectedAccounts.size} 个账号`;
+            } else {
+                batchActions.classList.remove('show');
+            }
+        }
+        
+        function exportSelected() {
+            if (selectedAccounts.size === 0) {
+                alert('请先选择要导出的账号');
+                return;
+            }
+            
+            // 创建导出字符串，格式为：email----password----clientId----refreshToken
+            const exportLines = [];
+            const delimiter = document.getElementById('delimiter').value || '----';
+            
+            for (const email of selectedAccounts) {
+                const account = allAccounts[email];
+                if (account) {
+                    // 密码位置使用占位符
+                    const exportLine = `${email}${delimiter}password${delimiter}${account.client_id}${delimiter}${account.refresh_token}`;
+                    exportLines.push(exportLine);
+                }
+            }
+            
+            const exportText = exportLines.join('\n');
+            
+            // 复制到剪贴板
+            navigator.clipboard.writeText(exportText).then(() => {
+                alert(`成功导出 ${selectedAccounts.size} 个账号到剪贴板`);
+            }).catch(err => {
+                // 如果复制失败，则创建一个临时文本区域
+                const textArea = document.createElement('textarea');
+                textArea.value = exportText;
+                document.body.appendChild(textArea);
+                textArea.select();
+                
+                try {
+                    document.execCommand('copy');
+                    alert(`成功导出 ${selectedAccounts.size} 个账号到剪贴板`);
+                } catch (err) {
+                    alert('复制失败，请手动复制以下内容:\n\n' + exportText);
+                }
+                
+                document.body.removeChild(textArea);
+            });
+        }
+        
+        function deleteSelected() {
+            if (selectedAccounts.size === 0) {
+                alert('请先选择要删除的账号');
+                return;
+            }
+            
+            if (!confirm(`确定要删除选中的 ${selectedAccounts.size} 个账号吗？此操作不可撤销。`)) {
+                return;
+            }
+            
+            // 创建所有删除操作的数组
+            const deletePromises = Array.from(selectedAccounts).map(email => 
+                fetch(`/manage?email=${email}`, { method: 'DELETE' })
+            );
+            
+            // 并行处理所有删除请求
+            Promise.all(deletePromises)
+                .then(responses => {
+                    // 检查是否所有删除都成功
+                    const failedCount = responses.filter(r => !r.ok).length;
+                    
+                    if (failedCount === 0) {
+                        alert(`成功删除 ${selectedAccounts.size} 个账号`);
+                    } else {
+                        alert(`删除操作部分失败，有 ${failedCount} 个账号删除失败`);
+                    }
+                    
+                    // 清空选中集合并刷新账号列表
+                    selectedAccounts.clear();
+                    loadAccounts();
+                    updateBatchActionsBar();
+                })
+                .catch(error => {
+                    alert('删除操作出错: ' + error.message);
+                });
+        }
+
+        function copyEmailToClipboard(email) {
+            navigator.clipboard.writeText(email).then(() => {
+                alert('邮箱地址已复制: ' + email);
+            }).catch(() => {
+                alert('复制失败，请手动复制: ' + email);
+            });
+        }
+
+        async function deleteAccount(event, email) {
+            event.preventDefault();
+            if (!confirm('确定要删除账号 ' + email + ' 吗？')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/manage?email=' + email, { method: 'DELETE' });
+                if (response.ok) {
+                    alert('账号已删除');
+                    // 如果有选中的账号，需要从选中集合中移除
+                    if (selectedAccounts.has(email)) {
+                        selectedAccounts.delete(email);
+                    }
+                    loadAccounts();
+                    updateBatchActionsBar();
+                } else {
+                    const error = await response.text();
+                    alert('错误: ' + error);
+                }
+            } catch (error) {
+                alert('错误: ' + error.message);
+            }
+        }
+
+        document.getElementById('addAccountForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const email = formData.get('email');
+            const refresh_token = formData.get('refresh_token');
+            const client_id = formData.get('client_id');
+
+            try {
+                const response = await fetch('/manage', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        refresh_token: refresh_token,
+                        client_id: client_id
+                    })
+                });
+
+                if (response.ok) {
+                    alert('账号添加成功');
+                    loadAccounts();
+                    event.target.reset();
+                } else {
+                    const error = await response.text();
+                    alert('错误: ' + error);
+                }
+            } catch (error) {
+                alert('错误: ' + error.message);
+            }
+        });
+
+        function importAccount() {
+            const importText = document.getElementById('importText').value;
+            const delimiter = document.getElementById('delimiter').value || '----';
+            
+            // 分割每一行作为单独的账号
+            const lines = importText.trim().split('\n').filter(line => line.trim() !== '');
+            
+            if (lines.length === 0) {
+                alert('请输入有效的账号信息');
+                return;
+            }
+            
+            if (lines.length === 1) {
+                // 单个账号导入
+                processSingleAccount(lines[0], delimiter);
+            } else {
+                // 批量导入
+                processMultipleAccounts(lines, delimiter);
+            }
+        }
+        
+        function processSingleAccount(accountStr, delimiter) {
+            const parts = accountStr.split(delimiter);
+            
+            if (parts.length >= 4) {
+                const email = parts[0];
+                const clientId = parts[2];
+                const refreshToken = parts[3];
+
+                document.getElementById('email').value = email;
+                document.getElementById('client_id').value = clientId;
+                document.getElementById('refresh_token').value = refreshToken;
+                alert('账号信息已填充到表单，请点击"添加账号"按钮提交。');
+            } else {
+                alert('导入格式不正确，请检查示例格式和分隔符设置。');
+            }
+        }
+        
+        async function processMultipleAccounts(accountLines, delimiter) {
+            let successCount = 0;
+            let failCount = 0;
+            let errors = [];
+            const totalAccounts = accountLines.length;
+            
+            // 创建导入状态元素
+            const statusDiv = document.createElement('div');
+            statusDiv.style.marginTop = '10px';
+            statusDiv.style.padding = '10px';
+            statusDiv.style.backgroundColor = 'var(--card-bg)';
+            statusDiv.style.border = '1px solid var(--card-border)';
+            statusDiv.style.borderRadius = '0.3rem';
+            statusDiv.innerHTML = "<p>正在导入 " + totalAccounts + " 个账号...</p>";
+            document.querySelector('.import-area').appendChild(statusDiv);
+            
+            // 创建所有导入任务的数组
+            const importTasks = accountLines.map(async (line, index) => {
+                const parts = line.split(delimiter);
+                
+                if (parts.length >= 4) {
+                    const email = parts[0].trim();
+                    const clientId = parts[2].trim();
+                    const refreshToken = parts[3].trim();
+                    
+                    try {
+                        const response = await fetch('/manage', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                email: email,
+                                refresh_token: refreshToken,
+                                client_id: clientId
+                            })
+                        });
+                        
+                        if (response.ok) {
+                            return { success: true, email, index };
+                        } else {
+                            const error = await response.text();
+                            return { success: false, email, error, index };
+                        }
+                    } catch (error) {
+                        return { success: false, email, error: error.message, index };
+                    }
+                } else {
+                    return { success: false, error: '格式错误', line, index };
+                }
+            });
+            
+            // 并行处理所有导入任务
+            const results = await Promise.all(importTasks);
+            
+            // 处理结果
+            for (const result of results) {
+                if (result.success) {
+                    successCount++;
+                } else {
+                    failCount++;
+                    errors.push("#" + (result.index + 1) + " " + (result.email || result.line) + ": " + result.error);
+                }
+            }
+            
+            if (successCount > 0) {
+                loadAccounts();
+            }
+            
+            // 移除状态元素
+            document.querySelector('.import-area').removeChild(statusDiv);
+            
+            let message = `导入完成：共 ${totalAccounts} 个账号\n`;
+            message += `✅ 成功: ${successCount} 个\n`;
+            if (failCount > 0) {
+                message += `❌ 失败: ${failCount} 个\n\n`;
+                message += errors.join('\n');
+            }
+            
+            alert(message);
+        }
+        
+        // 页面加载时初始化
+        window.addEventListener('DOMContentLoaded', () => {
+            loadAccounts();
+        });
+    </script>
+</body>
+</html> 

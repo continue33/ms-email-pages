@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>邮箱 API 客户端</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.1.0/fonts/remixicon.css">
+    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/d/df/Microsoft_Office_Outlook_%282018%E2%80%93present%29.svg">
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --text-color: #212529;
+            --accent-color: #0078d4; /* Outlook blue */
+            --card-bg: #fff;
+            --card-border: #c8c8c8;
+            --button-primary: #0078d4;
+            --button-primary-hover: #005a9e;
+            --button-secondary: #f3f3f3;
+            --button-secondary-hover: #e0e0e0;
+            --header-bg: #fff;
+            --header-border-bottom: #e0e0e0;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #18191a;
+                --text-color: #f0f0f0;
+                --accent-color: #3ab7f0;
+                --card-bg: #333;
+                --card-border: #555;
+                --button-primary: #3ab7f0;
+                --button-primary-hover: #2a88b8;
+                --button-secondary: #444;
+                --button-secondary-hover: #555;
+                --header-bg: #333;
+                --header-border-bottom: #555;
+            }
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .header {
+            background-color: var(--header-bg);
+            border-bottom: 1px solid var(--header-border-bottom);
+            padding: 15px 0;
+            text-align: center;
+            width: 100%;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .header-content {
+            width: 90%;
+            max-width: 960px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 960px;
+        }
+
+        h1 {
+            color: var(--accent-color);
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+        }
+
+        .manage-link {
+            text-align: right;
+            margin-bottom: 15px;
+        }
+
+        .manage-link a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .manage-link a:hover {
+            text-decoration: underline;
+        }
+
+        .account {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 0.3rem;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .account h2 {
+            color: var(--text-color);
+            font-size: 1.2rem;
+            margin-top: 0;
+            margin-bottom: 0.8rem;
+            cursor: pointer;
+            overflow-wrap: break-word;
+            word-break: break-all;
+        }
+
+        @media (max-width: 768px) {
+            .account h2 {
+                font-size: 1rem;
+            }
+        }
+
+        .account h2:hover {
+            text-decoration: underline;
+        }
+
+        .actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.8rem;
+        }
+
+        button {
+            padding: 0.6rem 1.2rem;
+            border: 1px solid transparent;
+            border-radius: 0.3rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.15s ease-in-out;
+            box-shadow: none;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        button:focus {
+            outline: 2px solid var(--accent-color);
+            outline-offset: -2px;
+        }
+
+        button.btn-primary {
+            background-color: var(--button-primary);
+            color: white;
+        }
+
+        button.btn-primary:hover {
+            background-color: var(--button-primary-hover);
+        }
+
+        button.btn-secondary {
+            background-color: var(--button-secondary);
+            color: var(--text-color);
+            border: 1px solid var(--card-border);
+        }
+
+        button.btn-secondary:hover {
+            background-color: var(--button-secondary-hover);
+        }
+
+        .copy-message {
+            margin-top: 0.4rem;
+            font-size: 0.8rem;
+            display: none;
+        }
+        
+        .search-container {
+            display: flex;
+            margin-bottom: 15px;
+            gap: 10px;
+        }
+
+        .search-container input {
+            flex-grow: 1;
+            padding: 0.6rem 0.8rem;
+            border: 1px solid var(--card-border);
+            border-radius: 0.3rem;
+            font-size: 0.9rem;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+        }
+
+        .search-container button {
+            padding: 0.6rem 1.2rem;
+            white-space: nowrap;
+        }
+
+        .account.hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <h1>邮箱 API 客户端</h1>
+        </div>
+    </header>
+    <div class="container">
+        <div class="manage-link">
+            <a href="/manage" target="_blank">管理账号</a>
+            <span id="accountCount"></span>
+        </div>
+        
+        <div class="search-container">
+            <input type="text" id="searchBox" placeholder="搜索邮箱 (例如: outlook.com)" oninput="filterAccounts()">
+            <button class="btn-secondary" onclick="clearSearch()">清除</button>
+        </div>
+        
+        <div id="accounts"></div>
+    </div>
+    <script>
+        const API_BASE_URL = 'https://ms-email-oscar.itvoyager.us/api';
+        
+        // 全局变量，保存所有账号
+        let allAccounts = {};
+
+        async function loadAccounts() {
+            const response = await fetch('/accounts');
+            allAccounts = await response.json();
+            displayAccounts(allAccounts);
+        }
+        
+        function displayAccounts(accounts, searchTerm = '') {
+            const accountsDiv = document.getElementById('accounts');
+            accountsDiv.innerHTML = '';
+            
+            // 添加账号总数显示
+            const accountCount = Object.keys(accounts).length;
+            const totalCount = Object.keys(allAccounts).length;
+            let countMessage = ` (共 ${totalCount} 个账号)`;
+            
+            if (searchTerm) {
+                countMessage += ` - 找到 ${accountCount} 个匹配结果`;
+            }
+            
+            document.getElementById('accountCount').textContent = countMessage;
+            
+            // 添加带序号的账号
+            let index = 1;
+            for (const email in accounts) {
+                const account = accounts[email];
+                const accountDiv = document.createElement('div');
+                accountDiv.classList.add('account');
+                accountDiv.innerHTML = `
+                    <h2 onclick="copyToClipboard('${email}', event)" title="点击复制">${index}. ${email}</h2>
+                    <div class="actions">
+                        <button class="btn-primary" onclick="openApiUrl('${email}', 'INBOX', 'new')">获取新邮件 (收件箱)</button>
+                        <button class="btn-primary" onclick="openApiUrl('${email}', 'Junk', 'new')">获取新邮件 (垃圾邮件)</button>
+                        <button class="btn-primary" onclick="composeMail('${email}')">发送邮件</button>
+                        <button class="btn-primary" onclick="openApiUrl('${email}', 'INBOX', 'all')">获取全部邮件</button>
+                        <button class="btn-primary" onclick="openApiUrl('${email}', 'Junk', 'all')">获取全部邮件 (垃圾邮件)</button>
+                        <button class="btn-secondary" onclick="openApiUrl('${email}', 'INBOX', 'process')">清空收件箱</button>
+                    </div>
+                    <div class="copy-message"></div>
+                `;
+                accountsDiv.appendChild(accountDiv);
+                index++;
+            }
+        }
+        
+        function filterAccounts() {
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase().trim();
+            
+            if (!searchTerm) {
+                displayAccounts(allAccounts);
+                return;
+            }
+            
+            const filteredAccounts = {};
+            
+            for (const email in allAccounts) {
+                if (email.toLowerCase().includes(searchTerm)) {
+                    filteredAccounts[email] = allAccounts[email];
+                }
+            }
+            
+            displayAccounts(filteredAccounts, searchTerm);
+        }
+        
+        function clearSearch() {
+            document.getElementById('searchBox').value = '';
+            displayAccounts(allAccounts);
+        }
+
+        function openApiUrl(email, mailbox, type) {
+            fetch('/accounts').then(response => response.json()).then(accounts => {
+                const account = accounts[email];
+                if (!account) {
+                    alert('账号不存在！');
+                    return;
+                }
+                let url;
+                if (type === 'new') {
+                    url = `${API_BASE_URL}/mail-new?refresh_token=${account.refresh_token}&client_id=${account.client_id}&email=${email}&mailbox=${mailbox}&response_type=html`;
+                } else if (type === 'all') {
+                    url = `${API_BASE_URL}/mail-all?refresh_token=${account.refresh_token}&client_id=${account.client_id}&email=${email}&mailbox=${mailbox}`;
+                } else if (type === 'process') {
+                    const apiEndpoint = mailbox === 'INBOX' ? 'process-inbox' : 'process-junk';
+                    url = `${API_BASE_URL}/${apiEndpoint}?refresh_token=${account.refresh_token}&client_id=${account.client_id}&email=${email}`;
+                }
+                if (url) {
+                    window.open(url, '_blank');
+                }
+            });
+        }
+        
+        // 打开邮件撰写页面
+        function composeMail(email) {
+            window.location.href = `/compose?email=${encodeURIComponent(email)}`;
+        }
+
+        function copyToClipboard(text, event) {
+            navigator.clipboard.writeText(text).then(() => {
+                const messageDiv = event.target.nextElementSibling.nextElementSibling;
+                messageDiv.textContent = '邮箱地址已复制';
+                messageDiv.style.display = 'block';
+                setTimeout(() => {
+                    messageDiv.style.display = 'none';
+                }, 2000);
+            }, () => {
+                const messageDiv = event.target.nextElementSibling.nextElementSibling;
+                messageDiv.textContent = '复制失败，请手动复制';
+                messageDiv.style.display = 'block';
+                setTimeout(() => {
+                    messageDiv.style.display = 'none';
+                }, 2000);
+            });
+        }
+
+        loadAccounts();
+    </script>
+</body>
+</html> 

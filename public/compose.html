@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>撰写邮件</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.1.0/fonts/remixicon.css">
+    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/d/df/Microsoft_Office_Outlook_%282018%E2%80%93present%29.svg">
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --text-color: #212529;
+            --accent-color: #0078d4;
+            --card-bg: #fff;
+            --card-border: #c8c8c8;
+            --button-primary: #0078d4;
+            --button-primary-hover: #005a9e;
+            --button-secondary: #f3f3f3;
+            --button-secondary-hover: #e0e0e0;
+            --header-bg: #fff;
+            --header-border-bottom: #e0e0e0;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #18191a;
+                --text-color: #f0f0f0;
+                --accent-color: #3ab7f0;
+                --card-bg: #333;
+                --card-border: #555;
+                --button-primary: #3ab7f0;
+                --button-primary-hover: #2a88b8;
+                --button-secondary: #444;
+                --button-secondary-hover: #555;
+                --header-bg: #333;
+                --header-border-bottom: #555;
+            }
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .header {
+            background-color: var(--header-bg);
+            border-bottom: 1px solid var(--header-border-bottom);
+            padding: 15px 0;
+            text-align: center;
+            width: 100%;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .header-content {
+            width: 90%;
+            max-width: 800px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            padding-bottom: 40px;
+        }
+
+        h1 {
+            color: var(--accent-color);
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+        }
+
+        .back-link {
+            text-align: right;
+            margin-bottom: 1.5rem;
+        }
+
+        .back-link a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+
+        .compose-form {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 0.3rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-color);
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            border: 1px solid var(--card-border);
+            border-radius: 0.3rem;
+            font-size: 0.9rem;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            box-sizing: border-box;
+        }
+
+        textarea {
+            min-height: 200px;
+            resize: vertical;
+        }
+
+        .format-toggle {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .format-toggle label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .format-toggle input {
+            width: auto;
+            margin-right: 0.5rem;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1rem;
+        }
+
+        button {
+            padding: 0.6rem 1.2rem;
+            border: 1px solid transparent;
+            border-radius: 0.3rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.15s ease-in-out;
+        }
+
+        button.btn-primary {
+            background-color: var(--button-primary);
+            color: white;
+        }
+
+        button.btn-primary:hover {
+            background-color: var(--button-primary-hover);
+        }
+
+        button.btn-secondary {
+            background-color: var(--button-secondary);
+            color: var(--text-color);
+            border: 1px solid var(--card-border);
+        }
+
+        button.btn-secondary:hover {
+            background-color: var(--button-secondary-hover);
+        }
+
+        .alert {
+            padding: 0.75rem 1.25rem;
+            margin-bottom: 1rem;
+            border: 1px solid transparent;
+            border-radius: 0.3rem;
+        }
+
+        .alert-success {
+            color: #155724;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+
+        .alert-danger {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .alert-success {
+                color: #d4edda;
+                background-color: #155724;
+                border-color: #c3e6cb;
+            }
+            
+            .alert-danger {
+                color: #f8d7da;
+                background-color: #721c24;
+                border-color: #f5c6cb;
+            }
+        }
+
+        #result {
+            display: none;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <h1>撰写邮件</h1>
+        </div>
+    </header>
+    <div class="container">
+        <div class="back-link">
+            <a href="/">返回邮箱列表</a>
+        </div>
+        
+        <div id="result" class="alert"></div>
+        
+        <div class="compose-form">
+            <form id="emailForm">
+                <div class="form-group">
+                    <label for="from">发件人：</label>
+                    <select id="from" name="from" required>
+                        <option value="">-- 选择发件邮箱 --</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="to">收件人：</label>
+                    <input type="email" id="to" name="to" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="subject">主题：</label>
+                    <input type="text" id="subject" name="subject" required>
+                </div>
+                
+                <div class="format-toggle">
+                    <label>
+                        <input type="radio" name="format" value="text" checked>
+                        纯文本
+                    </label>
+                    <label>
+                        <input type="radio" name="format" value="html">
+                        HTML
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label for="content">内容：</label>
+                    <textarea id="content" name="content" required></textarea>
+                </div>
+                
+                <div class="buttons">
+                    <button type="button" class="btn-secondary" onclick="window.location.href='/'">取消</button>
+                    <button type="submit" class="btn-primary">发送邮件</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 获取URL参数中的邮箱
+        const urlParams = new URLSearchParams(window.location.search);
+        const preselectedEmail = urlParams.get('email');
+        
+        // 加载账号列表
+        async function loadAccounts() {
+            try {
+                const response = await fetch('/accounts');
+                const accounts = await response.json();
+                
+                const fromSelect = document.getElementById('from');
+                
+                // 清空现有选项
+                fromSelect.innerHTML = '<option value="">-- 选择发件邮箱 --</option>';
+                
+                // 添加所有邮箱
+                for (const email in accounts) {
+                    const option = document.createElement('option');
+                    option.value = email;
+                    option.textContent = email;
+                    fromSelect.appendChild(option);
+                }
+                
+                // 如果URL中有预选的邮箱，则选中它
+                if (preselectedEmail && fromSelect.querySelector(`option[value="${preselectedEmail}"]`)) {
+                    fromSelect.value = preselectedEmail;
+                }
+            } catch (error) {
+                showResult('加载账号失败: ' + error.message, 'error');
+            }
+        }
+        
+        // 显示结果提示
+        function showResult(message, type) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = message;
+            resultDiv.style.display = 'block';
+            
+            if (type === 'success') {
+                resultDiv.className = 'alert alert-success';
+            } else {
+                resultDiv.className = 'alert alert-danger';
+            }
+            
+            // 滚动到顶部
+            window.scrollTo(0, 0);
+            
+            // 如果是成功，3秒后自动隐藏
+            if (type === 'success') {
+                setTimeout(() => {
+                    resultDiv.style.display = 'none';
+                }, 3000);
+            }
+        }
+        
+        // 处理表单提交
+        document.getElementById('emailForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // 禁用提交按钮防止重复提交
+            const submitButton = this.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.textContent = '发送中...';
+            
+            // 获取表单数据
+            const email = document.getElementById('from').value;
+            const to = document.getElementById('to').value;
+            const subject = document.getElementById('subject').value;
+            const content = document.getElementById('content').value;
+            const format = document.querySelector('input[name="format"]:checked').value;
+            
+            try {
+                // 发送请求
+                const response = await fetch('/send-mail', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email,
+                        to,
+                        subject,
+                        content,
+                        format
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showResult('邮件发送成功!', 'success');
+                    // 清空表单
+                    document.getElementById('to').value = '';
+                    document.getElementById('subject').value = '';
+                    document.getElementById('content').value = '';
+                } else {
+                    showResult('发送失败: ' + (result.error || '未知错误'), 'error');
+                }
+            } catch (error) {
+                showResult('发送错误: ' + error.message, 'error');
+            } finally {
+                // 恢复提交按钮
+                submitButton.disabled = false;
+                submitButton.textContent = '发送邮件';
+            }
+        });
+        
+        // 页面加载时获取账号列表
+        loadAccounts();
+    </script>
+</body>
+</html> 
